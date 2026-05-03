@@ -19,6 +19,10 @@ SYSTEM_PROMPT = SystemMessage(
     - Weather details
     
     Use the available tools to gather information and make detailed cost breakdowns.
+    If a tool cannot be used because an API key or external service is unavailable, do not stop.
+    Continue with the rest of the answer using general travel knowledge and clearly label any
+    missing sections as estimates, unavailable live data, or suggestions to configure the API key.
+    Never claim real-time data if the tool was unavailable.
     Provide everything in one comprehensive response formatted in clean Markdown.
     """
 )

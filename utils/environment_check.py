@@ -8,9 +8,9 @@ ENV_REQUIREMENTS = {
     "Gemini": ("GEMINI_API_KEY",),
     "Groq": ("GROQ_API_KEY",),
     "Google": ("GOOGLE_API_KEY",),
-    "Google Places": ("GPLACE_API_KEY",),
+    "Google Places": ("GPLACES_API_KEY", "GPLACE_API_KEY"),
     "Tavily": ("TAVILY_API_KEY", "TAVILAY_API_KEY"),
-    "OpenWeather": ("OPENWEATHER_API_KEY",),
+    "OpenWeather": ("OPENWEATHERMAP_API_KEY", "OPENWEATHER_API_KEY"),
     "Exchange Rate": ("EXCHANGE_RATE_API_KEY", "EXCHANGHE_RATE_API_KEY"),
 }
 

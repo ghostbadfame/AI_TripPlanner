@@ -27,13 +27,17 @@ async def query_travel_agent(query:QueryRequest):
         print(query)
         graph = GraphBuilder(model_provider="groq")
         react_app=graph()
-        #react_app = graph.build_graph()
+        #react_app = graph.build_graph() not using this as we are using __call__ to build and execute the graph 
+        # in one step. If you want to separate them, you can use build_graph() and then call 
+        # the react_app with messages. 
 
-        png_graph = react_app.get_graph().draw_mermaid_png()
-        with open("my_graph.png", "wb") as f:
-            f.write(png_graph)
-
-        print(f"Graph saved as 'my_graph.png' in {os.getcwd()}")
+        try:
+            png_graph = react_app.get_graph().draw_mermaid_png()
+            with open("my_graph.png", "wb") as f:
+                f.write(png_graph)
+            print(f"Graph saved as 'my_graph.png' in {os.getcwd()}")
+        except Exception as graph_error:
+            print(f"Skipping graph image generation: {graph_error}")
         # Assuming request is a pydantic object like: {"question": "your text"}
         messages={"messages": [query.question]}
         output = react_app.invoke(messages)
