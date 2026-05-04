@@ -1,3 +1,6 @@
+from exceptions.exceptionHandling import ValidationError
+
+
 class Calculator:
     @staticmethod
     def _to_float(value: float | int | str) -> float:
@@ -5,8 +8,18 @@ class Calculator:
         if isinstance(value, (int, float)):
             return float(value)
 
+        if not isinstance(value, str) or not value.strip():
+            raise ValidationError("A numeric value is required for this calculation.")
+
         cleaned = value.strip().replace(",", "")
-        return float(cleaned)
+
+        try:
+            return float(cleaned)
+        except ValueError as exc:
+            raise ValidationError(
+                "Invalid numeric value provided.",
+                details={"value": value},
+            ) from exc
 
     @classmethod
     def multiply(cls, a: float | int | str, b: float | int | str) -> float:
@@ -49,4 +62,6 @@ class Calculator:
         """
         total_value = cls._to_float(total)
         days_value = cls._to_float(days)
-        return total_value / days_value if days_value > 0 else 0.0
+        if days_value <= 0:
+            raise ValidationError("Number of days must be greater than zero.")
+        return total_value / days_value

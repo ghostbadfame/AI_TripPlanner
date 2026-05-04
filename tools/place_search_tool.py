@@ -4,6 +4,7 @@ from typing import List
 from dotenv import load_dotenv
 from langchain.tools import tool
 
+from exceptions.exceptionHandling import AppException, ExternalServiceError
 from utils.place_info_search import GooglePlaceSearchTool, TavilyPlaceSearchTool
 
 
@@ -45,15 +46,21 @@ class PlaceSearchTool:
                 )
                 if attraction_result:
                     return f"Following are the attractions of {place} as suggested by google: {attraction_result}"
-            except Exception as e:
+            except AppException as e:
                 if self.tavily_api_key:
-                    tavily_result = self.tavily_search.tavily_search_attractions(place)
-                    return f"Google cannot find the details due to {e}. \nFollowing are the attractions of {place}: {tavily_result}"
-                return f"Attraction search is not configured: {e}"
+                    try:
+                        tavily_result = self.tavily_search.tavily_search_attractions(place)
+                        return f"Google cannot find the details due to {e.message}. \nFollowing are the attractions of {place}: {tavily_result}"
+                    except ExternalServiceError as tavily_error:
+                        return tavily_error.message
+                return e.message
 
             if self.tavily_api_key:
-                tavily_result = self.tavily_search.tavily_search_attractions(place)
-                return f"Following are the attractions of {place}: {tavily_result}"
+                try:
+                    tavily_result = self.tavily_search.tavily_search_attractions(place)
+                    return f"Following are the attractions of {place}: {tavily_result}"
+                except AppException as exc:
+                    return exc.message
             return self._fallback_message("Attraction search")
 
         @tool
@@ -67,15 +74,21 @@ class PlaceSearchTool:
                 )
                 if restaurants_result:
                     return f"Following are the restaurants of {place} as suggested by google: {restaurants_result}"
-            except Exception as e:
+            except AppException as e:
                 if self.tavily_api_key:
-                    tavily_result = self.tavily_search.tavily_search_restaurants(place)
-                    return f"Google cannot find the details due to {e}. \nFollowing are the restaurants of {place}: {tavily_result}"
-                return f"Restaurant search is not configured: {e}"
+                    try:
+                        tavily_result = self.tavily_search.tavily_search_restaurants(place)
+                        return f"Google cannot find the details due to {e.message}. \nFollowing are the restaurants of {place}: {tavily_result}"
+                    except ExternalServiceError as tavily_error:
+                        return tavily_error.message
+                return e.message
 
             if self.tavily_api_key:
-                tavily_result = self.tavily_search.tavily_search_restaurants(place)
-                return f"Following are the restaurants of {place}: {tavily_result}"
+                try:
+                    tavily_result = self.tavily_search.tavily_search_restaurants(place)
+                    return f"Following are the restaurants of {place}: {tavily_result}"
+                except AppException as exc:
+                    return exc.message
             return self._fallback_message("Restaurant search")
 
         @tool
@@ -89,15 +102,21 @@ class PlaceSearchTool:
                 )
                 if activities_result:
                     return f"Following are the activities in and around {place} as suggested by google: {activities_result}"
-            except Exception as e:
+            except AppException as e:
                 if self.tavily_api_key:
-                    tavily_result = self.tavily_search.tavily_search_activity(place)
-                    return f"Google cannot find the details due to {e}. \nFollowing are the activities of {place}: {tavily_result}"
-                return f"Activity search is not configured: {e}"
+                    try:
+                        tavily_result = self.tavily_search.tavily_search_activity(place)
+                        return f"Google cannot find the details due to {e.message}. \nFollowing are the activities of {place}: {tavily_result}"
+                    except ExternalServiceError as tavily_error:
+                        return tavily_error.message
+                return e.message
 
             if self.tavily_api_key:
-                tavily_result = self.tavily_search.tavily_search_activity(place)
-                return f"Following are the activities of {place}: {tavily_result}"
+                try:
+                    tavily_result = self.tavily_search.tavily_search_activity(place)
+                    return f"Following are the activities of {place}: {tavily_result}"
+                except AppException as exc:
+                    return exc.message
             return self._fallback_message("Activity search")
 
         @tool
@@ -114,15 +133,21 @@ class PlaceSearchTool:
                         f"Following are the modes of transportation available in {place} "
                         f"as suggested by google: {transportation_result}"
                     )
-            except Exception as e:
+            except AppException as e:
                 if self.tavily_api_key:
-                    tavily_result = self.tavily_search.tavily_search_transportation(place)
-                    return f"Google cannot find the details due to {e}. \nFollowing are the modes of transportation available in {place}: {tavily_result}"
-                return f"Transportation search is not configured: {e}"
+                    try:
+                        tavily_result = self.tavily_search.tavily_search_transportation(place)
+                        return f"Google cannot find the details due to {e.message}. \nFollowing are the modes of transportation available in {place}: {tavily_result}"
+                    except ExternalServiceError as tavily_error:
+                        return tavily_error.message
+                return e.message
 
             if self.tavily_api_key:
-                tavily_result = self.tavily_search.tavily_search_transportation(place)
-                return f"Following are the modes of transportation available in {place}: {tavily_result}"
+                try:
+                    tavily_result = self.tavily_search.tavily_search_transportation(place)
+                    return f"Following are the modes of transportation available in {place}: {tavily_result}"
+                except AppException as exc:
+                    return exc.message
             return self._fallback_message("Transportation search")
 
         return [search_attractions, search_restaurants, search_activities, search_transportation]

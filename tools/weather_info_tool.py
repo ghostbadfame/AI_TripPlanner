@@ -4,6 +4,7 @@ from typing import List
 from dotenv import load_dotenv
 from langchain.tools import tool
 
+from exceptions.exceptionHandling import AppException
 from utils.weather_info import WeatherForecastTool
 
 
@@ -29,12 +30,13 @@ class WeatherInfoTool:
                     "weather and give only a clearly labeled general estimate if helpful."
                 )
 
-            weather_data = self.weather_service.get_current_weather(city)
-            if weather_data:
+            try:
+                weather_data = self.weather_service.get_current_weather(city)
                 temp = weather_data.get("main", {}).get("temp", "N/A")
                 desc = weather_data.get("weather", [{}])[0].get("description", "N/A")
                 return f"Current weather in {city}: {temp} deg C, {desc}"
-            return f"Could not fetch weather for {city}"
+            except AppException as exc:
+                return exc.message
 
         @tool
         def get_weather_forecast(city: str) -> str:
@@ -46,15 +48,18 @@ class WeatherInfoTool:
                     "forecast and give only a clearly labeled general estimate if helpful."
                 )
 
-            forecast_data = self.weather_service.get_forecast_weather(city)
-            if forecast_data and "list" in forecast_data:
-                forecast_summary = []
-                for item in forecast_data["list"]:
-                    date = item["dt_txt"].split(" ")[0]
-                    temp = item["main"]["temp"]
-                    desc = item["weather"][0]["description"]
-                    forecast_summary.append(f"{date}: {temp} degree celcius , {desc}")
-                return f"Weather forecast for {city}:\n" + "\n".join(forecast_summary)
-            return f"Could not fetch forecast for {city}"
+            try:
+                forecast_data = self.weather_service.get_forecast_weather(city)
+                if "list" in forecast_data:
+                    forecast_summary = []
+                    for item in forecast_data["list"]:
+                        date = item["dt_txt"].split(" ")[0]
+                        temp = item["main"]["temp"]
+                        desc = item["weather"][0]["description"]
+                        forecast_summary.append(f"{date}: {temp} degree celcius , {desc}")
+                    return f"Weather forecast for {city}:\n" + "\n".join(forecast_summary)
+                return f"Could not fetch forecast for {city}"
+            except AppException as exc:
+                return exc.message
 
         return [get_current_weather, get_weather_forecast]

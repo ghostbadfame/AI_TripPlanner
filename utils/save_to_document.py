@@ -1,8 +1,13 @@
 import os
 import datetime
 
+from exceptions.exceptionHandling import ProcessingError
+
 def save_document(response_text: str, directory: str = "./output"):
     """Export travel plan to Markdown file with proper formatting"""
+    if not response_text or not response_text.strip():
+        raise ProcessingError("Response text is empty; nothing to save.")
+
     os.makedirs(directory, exist_ok=True)
     
     
@@ -35,6 +40,8 @@ def save_document(response_text: str, directory: str = "./output"):
         print(f"Markdown file saved as: {filename}")
         return filename
         
-    except Exception as e:
-        print(f"Error saving markdown file: {e}")
-        return None
+    except OSError as exc:
+        raise ProcessingError(
+            "Failed to save markdown document.",
+            details={"directory": os.path.abspath(directory)},
+        ) from exc

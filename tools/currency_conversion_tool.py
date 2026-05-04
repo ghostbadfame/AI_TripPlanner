@@ -4,6 +4,7 @@ from typing import List
 from dotenv import load_dotenv
 from langchain.tools import tool
 
+from exceptions.exceptionHandling import AppException
 from utils.currency_convertor import CurrencyConverter
 
 
@@ -26,6 +27,9 @@ class CurrencyConverterTool:
                     "`EXCHANGHE_RATE_API_KEY`. Until then, tell the user you cannot provide a "
                     "live exchange rate and only provide rough labeled estimates if needed."
                 )
-            return self.currency_service.convert(amount, from_currency, to_currency)
+            try:
+                return self.currency_service.convert(amount, from_currency, to_currency)
+            except AppException as exc:
+                return exc.message
 
         return [convert_currency]
